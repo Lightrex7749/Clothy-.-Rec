@@ -1,67 +1,117 @@
-# VESTIRE — Personal Fashion Stylist
+# 🏛️ ClothyRec — AI Personal Fashion Stylist
 
-A multimodal fashion stylist app
+**ClothyRec** is a premium, high-performance AI fashion assistant designed with a sophisticated Swiss-Brutalist editorial aesthetic. It combines state-of-the-art computer vision models with the conversational intelligence of Gemini AI to provide precise, context-aware styling advice.
 
-> **Architecture in this build:** all heavy ML (PyTorch / FAISS / YOLOv8 / CLIP / MTCNN) was deliberately replaced with a single Gemini 2.5 Flash multimodal pipeline (per user choice). All persistent state (wardrobe, saved outfits, profile, preferences) lives **in the browser via `localStorage`** — the FastAPI backend is a thin proxy.
+---
 
-## Stack
-- **Backend:** FastAPI + Google Gemini SDK calling Gemini 2.5 Flash
-- **Frontend:** React (CRA) + Tailwind + shadcn primitives, `Cormorant Garamond` + `Outfit` typography, dark Swiss-brutalist editorial theme
-- **Storage:** Browser `localStorage` (no DB)
+## 🚀 The Hybrid AI Architecture
 
-## Run
-Backend (already supervisor-managed at `:8001`):
+ClothyRec utilizes a powerful hybrid approach, blending local machine learning inference with cloud-based generative AI:
+
+### 1. The Computer Vision Core (Local PyTorch)
+- **Classification Ensemble:** Combines **ResNet-18** and **EfficientNet-B0** for highly accurate garment identification.
+- **Deep Embeddings:** Uses **OpenCLIP (ViT-B/32)** to generate 512-dimensional visual feature vectors.
+- **Similarity Search:** Powered by **FAISS**, performing sub-millisecond retrieval across thousands of catalog items.
+- **Human Geometry:** **YOLOv8 Pose** for body segment detection and **MTCNN** for precise facial analysis (skin-tone extraction).
+
+### 2. The Conversational Stylist (Gemini AI)
+- **Contextual Reasoning:** An integrated Gemini-powered chatbot that acts as "Atelier," your personal stylist.
+- **Data Exchange:** The chatbot is context-aware—it "sees" your latest wardrobe analysis, skin profile, and saved outfits to generate intelligent, personalized styling reasoning.
+- **Explanation Engine:** Translates raw ML scores (harmony, skin-match, occasion fit) into natural language advice.
+
+---
+
+## 🎨 Design Philosophy
+Inspired by high-fashion magazines and Swiss minimalism:
+- **Aesthetic:** Dark Zinc-950 palette, high-contrast white/black UI, and grain overlays.
+- **Experience:** Micro-animations, intersection-reveal hooks, and interactive "scroll-progress" indicators.
+- **Agnostic Persistence:** All user data (history, skin profile, bookmarks) is stored via `localStorage` for privacy and speed.
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Framework:** FastAPI
+- **ML Libraries:** PyTorch, Torchvision, Ultralytics (YOLOv8), FaceNet-PyTorch, Timm, Open-CLIP, FAISS.
+- **AI Integration:** Google GenAI SDK (Gemini).
+- **Server:** Uvicorn.
+
+### Frontend
+- **Framework:** React 19 + Vite
+- **Styling:** Tailwind CSS + Vanilla CSS (Swiss-Brutalist theme).
+- **Icons:** Lucide-React.
+- **API:** Fetch API with Vite Proxying.
+
+---
+
+## ⚡ Setup & Run
+
+### 1. Prerequisites
+- Python 3.10+
+- Node.js 18+
+- [Optional] CUDA-enabled GPU (Models will fallback to CPU automatically).
+
+### 2. Backend Setup
 ```bash
-cd /app/backend && uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+cd backend
+# Install dependencies
+pip install -r requirements.txt
+
+# Create .env file
+echo "GEMINI_API_KEY=your_key_here" > .env
+echo "GEMINI_MODEL=gemini-2.5-flash" >> .env
+echo "DATA_ROOT=D:/path/to/your/dataset" >> .env
+
+# Run server (default port 8002)
+python -m uvicorn app.main:app --port 8002 --reload
 ```
-Frontend:
+
+### 3. Frontend Setup
 ```bash
-cd /app/frontend && yarn install && yarn start
+cd frontend
+# Install dependencies
+npm install
+
+# Run dev server (default port 5173)
+npm run dev
 ```
 
-## Environment
-`/app/backend/.env`:
-```
-GEMINI_API_KEY=AIza...   # user supplied
-GEMINI_MODEL=gemini-2.5-flash
-```
+---
 
-## API
-| Method | Path | Purpose |
+## 🛰️ API Reference
+
+| Endpoint | Method | Description |
 |---|---|---|
-| GET | `/api/health` | health + gemini status |
-| GET | `/api/labels` | clothing label vocabulary |
-| POST | `/api/style/item` | classify + recommend from a single item photo |
-| POST | `/api/style/person` | analyze full-body photo + recommend top/bottom |
-| POST | `/api/skin/analyze` | advisory skin tone + palette |
-| POST | `/api/explain` | Gemini natural-language outfit reasoning |
+| `/health` | `GET` | System health and ML model status. |
+| `/api/style/item` | `POST` | Analyze a single garment and get pairings. |
+| `/api/style/person` | `POST` | Analyze a full-body photo for top/bottom style. |
+| `/api/skin/analyze` | `POST` | Extract undertones and generate color palettes. |
+| `/api/chat` | `POST` | Talk to the AI Stylist (Gemini) with ML context. |
 
-All image-bearing requests use base64 (`image_b64`, `mime`) — see `/app/frontend/src/lib/api.js`.
+---
 
-### Example
-```bash
-curl -X POST $REACT_APP_BACKEND_URL/api/style/item \
-  -H 'Content-Type: application/json' \
-  -d '{"image_b64":"<base64>","mime":"image/jpeg","occasion_text":"art opening","use_skin":false,"mode":"catalog"}'
+## 📦 Project Structure
+
+```text
+Atelier/
+├── backend/
+│   ├── app/
+│   │   ├── ml/        # Neural network definitions & Registry
+│   │   ├── routes/    # FastAPI Endpoints (style, skin, chat)
+│   │   ├── services/  # Business logic & scoring engines
+│   │   └── config.py  # Global settings & thresholds
+│   └── main.py        # Entry point
+├── frontend/
+│   ├── src/
+│   │   ├── components/ # Atomic UI & Floating Chat Widget
+│   │   ├── pages/      # Stylist, Skin, Profile, & Chat views
+│   │   ├── lib/        # API client, Hooks, & LocalStorage
+│   │   └── App.tsx     # Layout & Navigation
+└── README.md
 ```
 
-Response shape includes `prediction_resnet`, `prediction_effnet`, `prediction_ensemble`, `dominant_colors`, `recommendations[]` with per-rec `scores={img_score,txt_score,color_score,skin_score,final_score}` and `reasons[]`, plus `explanation_text`.
+---
 
-## Plugging in your own ML checkpoints
-The current build uses Gemini for classification/embeddings. To restore the original PyTorch + FAISS pipeline:
-1. Drop your files into `/app/backend/models/` and `/app/backend/index/`:
-   - `models/resnet18_best.pt`
-   - `models/effb0_best.pt`
-   - `index/clip_faiss.index`
-   - `index/clip_emb.npy`
-   - `index/meta.csv` (with `label` column + relative paths)
-2. Add a `MODEL_BACKEND=local` env var and branch in `server.py` between local model paths and Gemini.
-3. Implement `path-repair`: read `DATA_ROOT` from env, join with relative paths from `meta.csv`.
-
-## Frontend tabs
-`Item Photo`, `Person Photo`, `Wardrobe`, `Saved Outfits`, `Profile`. The Profile tab handles skin-tone analysis + palette + manual undertone override.
-
-## Notes
-- Color harmony, skin-undertone scoring and explainability are produced by Gemini in a single structured-JSON response.
-- The "ensemble" of two classifier predictions is emulated by Gemini for UI fidelity.
-- The app is fully usable offline for wardrobe/outfit browsing once items are stored in `localStorage`.
+## 📝 License
+This project is for educational and stylistic exploration. All models and code are open-source.
