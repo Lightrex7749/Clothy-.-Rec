@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════
+   ClothyRec — Dark Swiss-Brutalist Editorial Design System v2
+   Enhanced with scroll animations, micro-interactions, parallax
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg: #050505;
+  --surface: #111111;
+  --surface-glass: rgba(0,0,0,0.6);
+  --border: rgba(255,255,255,0.1);
+  --text-primary: #F4F4F5;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --accent: #FFFFFF;
+  --accent-red: #FF3333;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --error: #F87171;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body { min-height: 100vh; background: var(--bg); }
+
+/* ── Typography ─────────────────────────────────────────────── */
+.h-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+.overline {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.editorial-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: #D4D4D8;
+  border-left: 1px solid rgba(255,255,255,0.2);
+  padding-left: 1rem;
+}
+
+/* ── Film grain texture ─────────────────────────────────────── */
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ── Scroll-triggered reveal (IntersectionObserver-driven) ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* Initial load animation (for hero only) */
+.reveal-initial {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: revealUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.reveal-initial.reveal-delay-1 { animation-delay: 0.15s; }
+.reveal-initial.reveal-delay-2 { animation-delay: 0.3s; }
+.reveal-initial.reveal-delay-3 { animation-delay: 0.45s; }
+
+@keyframes revealUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Shimmer / Loading ──────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* ── Floating animation ─────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-float-delay { animation: float 4s ease-in-out 1s infinite; }
+
+/* ── Pulse glow ─────────────────────────────────────────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.1); }
+  50% { box-shadow: 0 0 30px 4px rgba(255,255,255,0.06); }
+}
+.pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+/* ── Gradient shift (hero background) ───────────────────────── */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.gradient-bg {
+  background: linear-gradient(135deg, #050505 0%, #0a0a1a 25%, #050505 50%, #0f0a0a 75%, #050505 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* ── Scroll progress bar ────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-red), var(--accent));
+  z-index: 100;
+  transition: width 0.1s linear;
+}
+
+/* ── Stat counter ───────────────────────────────────────────── */
+.stat-number {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Tech pill ──────────────────────────────────────────────── */
+.tech-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  transition: all 0.4s ease;
+  cursor: default;
+}
+.tech-pill:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+/* ── Interactive card hover glow ─────────────────────────────── */
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+.card-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255,255,255,0.04), transparent 60%);
+}
+.card-glow:hover::after { opacity: 1; }
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Dropzone ───────────────────────────────────────────────── */
+.dropzone {
+  border: 1px dashed rgba(255,255,255,0.15);
+  transition: all 0.4s ease;
+}
+.dropzone:hover, .dropzone.drag-over {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.02);
+}
+
+/* ── Score bar ──────────────────────────────────────────────── */
+.score-track {
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  position: relative;
+  width: 100%;
+}
+.score-fill {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  height: 3px;
+  background: #fff;
+  transition: width 0.6s ease-out;
+}
+
+/* ── History card ───────────────────────────────────────────── */
+.history-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #0A0A0A;
+  padding: 1.25rem;
+  transition: all 0.4s ease;
+}
+.history-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* ── Hamburger icon ─────────────────────────────────────────── */
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: white;
+  transition: all 0.3s ease;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+/* ── Marquee ────────────────────────────────────────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
