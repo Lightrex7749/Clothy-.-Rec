@@ -22,22 +22,30 @@ export default function ChatInterface({ fullPage = false }: { fullPage?: boolean
   }, [messages])
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return
+    const trimmed = input.trim()
+    if (!trimmed || isLoading) return
 
-    const userMessage: ChatTurn = { role: 'user', content: input.trim() }
+    const userMessage: ChatTurn = { role: 'user', content: trimmed }
+    const historyToSend = messages.slice(1)
+
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsLoading(true)
 
     try {
-      // Gather context
-      const context = getStats()
-      const historyToSent = messages.slice(1) // exclude initial greeting if desired, or send all
+      let context
+      try {
+        context = getStats()
+      } catch {
+        context = undefined
+      }
 
-      const res = await apiChat(userMessage.content, historyToSent, context)
-      setMessages(prev => [...prev, { role: 'model', content: res.reply }])
-    } catch (err: any) {
-      setMessages(prev => [...prev, { role: 'model', content: `Error: ${err.message}` }])
+      const res = await apiChat(userMessage.content, historyToSend, context)
+      const reply = res?.reply?.trim() || "I'm sorry, I couldn't generate a reply."
+      setMessages(prev => [...prev, { role: 'model', content: reply }])
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong.'
+      setMessages(prev => [...prev, { role: 'model', content: `Error: ${message}` }])
     } finally {
       setIsLoading(false)
     }
