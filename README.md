@@ -18,6 +18,7 @@ ClothyRec utilizes a powerful hybrid approach, blending local machine learning i
 - **Contextual Reasoning:** An integrated Gemini-powered chatbot that acts as "Atelier," your personal stylist.
 - **Data Exchange:** The chatbot is context-aware—it "sees" your latest wardrobe analysis, skin profile, and saved outfits to generate intelligent, personalized styling reasoning.
 - **Explanation Engine:** Translates raw ML scores (harmony, skin-match, occasion fit) into natural language advice.
+- **Prompt Optimization:** Optional Gemini-powered prompt refinement for the AI Look Generator.
 
 ---
 
@@ -58,14 +59,20 @@ cd backend
 # Install dependencies
 pip install -r requirements.txt
 
-# Create .env file
+# Create .env file (repo root)
+cd ..
 echo "GEMINI_API_KEY=your_key_here" > .env
 echo "GEMINI_MODEL=gemini-2.5-flash" >> .env
+echo "GEMINI_IMAGE_MODEL=your_image_model" >> .env
 echo "DATA_ROOT=D:/path/to/your/dataset" >> .env
 
 # Run server (default port 8002)
-python -m uvicorn app.main:app --port 8002 --reload
+python -m uvicorn app.main:app --app-dir backend --port 8002 --reload
 ```
+
+Notes:
+- `.env` is read from the repo root.
+- `GEMINI_IMAGE_MODEL` must be an image-capable model.
 
 ### 3. Frontend Setup
 ```bash
@@ -88,6 +95,9 @@ npm run dev
 | `/api/style/person` | `POST` | Analyze a full-body photo for top/bottom style. |
 | `/api/skin/analyze` | `POST` | Extract undertones and generate color palettes. |
 | `/api/chat` | `POST` | Talk to the AI Stylist (Gemini) with ML context. |
+| `/api/prompts` | `GET` | Fetch curated prompt presets. |
+| `/api/prompts/optimize` | `POST` | Optimize a prompt (gender + instructions). |
+| `/api/generate/image` | `POST` | Generate styled looks from a photo + prompt. |
 
 ---
 
