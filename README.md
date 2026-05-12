@@ -1,103 +1,39 @@
 # 🏛️ ClothyRec — AI Personal Fashion Stylist
 
-**ClothyRec** is a premium, high-performance AI fashion assistant designed with a sophisticated Swiss-Brutalist editorial aesthetic. It combines state-of-the-art computer vision models with the conversational intelligence of Gemini AI to provide precise, context-aware styling advice.
+ClothyRec is a full‑stack AI fashion assistant that blends local computer vision with Gemini-powered reasoning and prompt optimization. It analyzes garments or full‑body photos, recommends matching outfits, extracts skin tone palettes, and can generate styled looks from a reference image and a refined prompt.
 
 ---
 
-## 🚀 The Hybrid AI Architecture
+## ✨ Key Features
 
-ClothyRec utilizes a powerful hybrid approach, blending local machine learning inference with cloud-based generative AI:
-
-### 1. The Computer Vision Core (Local PyTorch)
-- **Classification Ensemble:** Combines **ResNet-18** and **EfficientNet-B0** for highly accurate garment identification.
-- **Deep Embeddings:** Uses **OpenCLIP (ViT-B/32)** to generate 512-dimensional visual feature vectors.
-- **Similarity Search:** Powered by **FAISS**, performing sub-millisecond retrieval across thousands of catalog items.
-- **Human Geometry:** **YOLOv8 Pose** for body segment detection and **MTCNN** for precise facial analysis (skin-tone extraction).
-
-### 2. The Conversational Stylist (Gemini AI)
-- **Contextual Reasoning:** An integrated Gemini-powered chatbot that acts as "Atelier," your personal stylist.
-- **Data Exchange:** The chatbot is context-aware—it "sees" your latest wardrobe analysis, skin profile, and saved outfits to generate intelligent, personalized styling reasoning.
-- **Explanation Engine:** Translates raw ML scores (harmony, skin-match, occasion fit) into natural language advice.
-- **Prompt Optimization:** Optional Gemini-powered prompt refinement for the AI Look Generator.
+- **Item + Person Styling**: Classify garments and recommend matching items, or analyze a full‑body photo and recommend for top + bottom.
+- **Skin Tone Analysis**: Extract undertone and palette from a selfie.
+- **AI Stylist Chat**: Gemini‑powered conversational stylist that uses local ML context.
+- **Prompt Presets + Optimization**: Curated prompt presets, gender‑aware prompt refinement, and a final prompt editor.
+- **AI Look Generator**: Generate new looks from a photo + prompt (Gemini image model).
 
 ---
 
-## 🎨 Design Philosophy
-Inspired by high-fashion magazines and Swiss minimalism:
-- **Aesthetic:** Dark Zinc-950 palette, high-contrast white/black UI, and grain overlays.
-- **Experience:** Micro-animations, intersection-reveal hooks, and interactive "scroll-progress" indicators.
-- **Agnostic Persistence:** All user data (history, skin profile, bookmarks) is stored via `localStorage` for privacy and speed.
+## 🧠 Architecture Overview
+
+### 1) Local Computer Vision Core (PyTorch)
+- **Classification Ensemble**: ResNet‑18 + EfficientNet‑B0
+- **Embeddings**: OpenCLIP (ViT‑B/32) 512‑D vectors
+- **Retrieval**: FAISS similarity search
+- **Body / Face**: YOLOv8 Pose (cropping), MTCNN (skin analysis)
+
+### 2) Gemini Services
+- **Chat**: Gemini generates stylist responses with ML context
+- **Prompt Optimization**: Gemini rewrites prompts based on gender + extra instructions
+- **Image Generation**: Gemini image model generates new looks
 
 ---
 
-## 🛠️ Tech Stack
+## 🖥️ Tech Stack
 
-### Backend
-- **Framework:** FastAPI
-- **ML Libraries:** PyTorch, Torchvision, Ultralytics (YOLOv8), FaceNet-PyTorch, Timm, Open-CLIP, FAISS.
-- **AI Integration:** Google GenAI SDK (Gemini).
-- **Server:** Uvicorn.
+**Backend**: FastAPI, PyTorch, OpenCLIP, FAISS, Ultralytics, FaceNet‑PyTorch, Google GenAI SDK
 
-### Frontend
-- **Framework:** React 19 + Vite
-- **Styling:** Tailwind CSS + Vanilla CSS (Swiss-Brutalist theme).
-- **Icons:** Lucide-React.
-- **API:** Fetch API with Vite Proxying.
-
----
-
-## ⚡ Setup & Run
-
-### 1. Prerequisites
-- Python 3.10+
-- Node.js 18+
-- [Optional] CUDA-enabled GPU (Models will fallback to CPU automatically).
-
-### 2. Backend Setup
-```bash
-cd backend
-# Install dependencies
-pip install -r requirements.txt
-
-# Create .env file (repo root)
-cd ..
-echo "GEMINI_API_KEY=your_key_here" > .env
-echo "GEMINI_MODEL=gemini-2.5-flash" >> .env
-echo "GEMINI_IMAGE_MODEL=your_image_model" >> .env
-echo "DATA_ROOT=D:/path/to/your/dataset" >> .env
-
-# Run server (default port 8002)
-python -m uvicorn app.main:app --app-dir backend --port 8002 --reload
-```
-
-Notes:
-- `.env` is read from the repo root.
-- `GEMINI_IMAGE_MODEL` must be an image-capable model.
-
-### 3. Frontend Setup
-```bash
-cd frontend
-# Install dependencies
-npm install
-
-# Run dev server (default port 5173)
-npm run dev
-```
-
----
-
-## 🛰️ API Reference
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/health` | `GET` | System health and ML model status. |
-| `/api/style/item` | `POST` | Analyze a single garment and get pairings. |
-| `/api/style/person` | `POST` | Analyze a full-body photo for top/bottom style. |
-| `/api/skin/analyze` | `POST` | Extract undertones and generate color palettes. |
-| `/api/chat` | `POST` | Talk to the AI Stylist (Gemini) with ML context. |
-| `/api/prompts` | `GET` | Fetch curated prompt presets. |
-| `/api/prompts/optimize` | `POST` | Optimize a prompt (gender + instructions). |
-| `/api/generate/image` | `POST` | Generate styled looks from a photo + prompt. |
+**Frontend**: React 19, Vite, Tailwind CSS, Lucide Icons
 
 ---
 
@@ -107,21 +43,92 @@ npm run dev
 Atelier/
 ├── backend/
 │   ├── app/
-│   │   ├── ml/        # Neural network definitions & Registry
-│   │   ├── routes/    # FastAPI Endpoints (style, skin, chat)
-│   │   ├── services/  # Business logic & scoring engines
-│   │   └── config.py  # Global settings & thresholds
-│   └── main.py        # Entry point
+│   │   ├── ml/         # model registry, inference, FAISS
+│   │   ├── routes/     # FastAPI endpoints
+│   │   ├── services/   # business logic and helpers
+│   │   └── config.py   # env + defaults
+│   └── static/         # uploads + prompt images
 ├── frontend/
 │   ├── src/
-│   │   ├── components/ # Atomic UI & Floating Chat Widget
-│   │   ├── pages/      # Stylist, Skin, Profile, & Chat views
-│   │   ├── lib/        # API client, Hooks, & LocalStorage
-│   │   └── App.tsx     # Layout & Navigation
+│   │   ├── components/ # UI blocks
+│   │   ├── pages/      # Chat, Stylist, Skin, Profile
+│   │   └── lib/        # API + storage
+├── data/               # dataset (ignored by git)
+├── models/             # weights (ignored by git)
 └── README.md
 ```
 
 ---
 
-## 📝 License
-This project is for educational and stylistic exploration. All models and code are open-source.
+## ⚙️ Environment Variables
+
+Create a **repo‑root** `.env` file (same level as `backend/`):
+
+```dotenv
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_IMAGE_MODEL=your_image_model
+DATA_ROOT=D:/path/to/your/dataset
+```
+
+Notes:
+- `.env` is loaded from the **repo root**.
+- `GEMINI_IMAGE_MODEL` must be **image‑capable** (see Gemini model list for your account).
+
+---
+
+## 🚀 Setup & Run
+
+### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+cd ..
+python -m uvicorn app.main:app --app-dir backend --port 8002 --reload
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on http://localhost:5173 and proxies API calls to port 8002.
+
+---
+
+## 🧩 API Reference
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/health` | `GET` | System health + model status |
+| `/labels` | `GET` | Class labels + v2 mode |
+| `/api/style/item` | `POST` | Analyze a single garment |
+| `/api/style/person` | `POST` | Analyze a full‑body photo |
+| `/api/skin/analyze` | `POST` | Extract skin undertone + palette |
+| `/api/chat` | `POST` | Stylist chat (Gemini) |
+| `/api/prompts` | `GET` | Prompt presets + images |
+| `/api/prompts/optimize` | `POST` | Optimize prompt (gender + instructions) |
+| `/api/generate/image` | `POST` | Generate new looks from photo + prompt |
+
+---
+
+## 💡 UI Highlights
+
+- **AI Look Generator**: upload a photo, select a prompt preset, refine with gender + instructions, and generate results.
+- **Chat**: real‑time stylist guidance with ML context.
+- **Profile**: saved outfits, history, and skin profile.
+
+---
+
+## 📝 Notes
+
+- Large datasets, models, and local files are ignored by git via `.gitignore`.
+- If Gemini image generation returns no images, verify `GEMINI_IMAGE_MODEL` is correct.
+
+---
+
+## 📄 License
+
+For educational and stylistic exploration.
