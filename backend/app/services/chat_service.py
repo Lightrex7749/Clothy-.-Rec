@@ -16,6 +16,50 @@ def _get_client() -> Optional[genai.Client]:
         return None
     return genai.Client(api_key=cfg.GEMINI_API_KEY)
 
+
+async def optimize_prompt(
+    prompt: str,
+    gender: str,
+    instructions: Optional[str] = None,
+) -> str:
+    """Optimize an image-generation prompt using Gemini."""
+    client = _get_client()
+    if not client:
+        return prompt
+
+    system_instruction = (
+        "You are a fashion prompt optimizer for image generation. "
+        "Rewrite the prompt for clarity and detail, keep it concise, "
+        "and return only the final prompt with no extra commentary."
+    )
+
+    extra = instructions.strip() if instructions else ""
+    user_text = (
+        f"Base prompt: {prompt}\n"
+        f"Gender: {gender}\n"
+        f"Extra instructions: {extra if extra else 'None'}"
+    )
+
+    from app.config import get_settings
+    cfg = get_settings()
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+
+    def _call_gemini() -> str:
+        response = client.models.generate_content(
+            model=model_name,
+            contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_text)])],
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+            ),
+        )
+        return response.text or prompt
+
+    try:
+        return await asyncio.to_thread(_call_gemini)
+    except Exception as e:
+        logger.exception("Failed to optimize prompt")
+        return prompt
+
 async def generate_chat_response(
     message: str,
     history: List[Dict[str, str]],
