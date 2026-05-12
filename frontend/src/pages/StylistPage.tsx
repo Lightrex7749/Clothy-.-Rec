@@ -121,6 +121,12 @@ export default function StylistPage({ mode }: Props) {
           <span className="border border-white/20 px-4 py-2 text-[11px] uppercase tracking-[0.15em] text-white">
             {result.direction.replace('->', ' → ')}
           </span>
+          {/* V2 indicator if explanation mentions 'similarity' or 'sources' */}
+          {result.explanation?.includes('similarity') && (
+             <span className="border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] font-medium flex items-center gap-1">
+               <Sparkles size={10} /> Enhanced Retrieval
+             </span>
+          )}
         </div>
       )}
 
@@ -132,9 +138,9 @@ export default function StylistPage({ mode }: Props) {
             <div className="overline">Recommendations</div>
             <div className="text-zinc-600 text-xs">{result.recommendations.length} matches</div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 stagger-children">
             {result.recommendations.map((rec, i) => (
-              <div key={i} className="relative group/card">
+              <div key={i} className="relative group/card reveal visible" style={{ animationDelay: `${i * 100}ms` }}>
                 <RecommendationCard rec={rec} rank={i + 1} apiBase={API_BASE} />
                 {/* Bookmark button */}
                 <button
@@ -209,7 +215,21 @@ export default function StylistPage({ mode }: Props) {
         </div>
         <div className="lg:col-span-5 space-y-6">
           <div>
-            <label className="overline block mb-2">Occasion</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="overline block">Occasion</label>
+              {/* Quick chips */}
+              <div className="hidden md:flex gap-2">
+                {['office', 'casual', 'party', 'date'].map(chip => (
+                  <button 
+                    key={chip}
+                    onClick={() => setOccasion(chip)}
+                    className="text-[9px] uppercase tracking-widest border border-white/20 px-2 py-0.5 text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
             <input
               type="text"
               placeholder="e.g. office meeting, wedding, casual brunch…"
@@ -227,7 +247,7 @@ export default function StylistPage({ mode }: Props) {
             </div>
           </div>
           {useSkin && (
-            <div className="reveal visible">
+            <div className="reveal visible slide-down">
               <label className="overline block mb-3">Your Undertone</label>
               <div className="flex gap-0">
                 {['warm', 'neutral', 'cool'].map(t => (
@@ -255,8 +275,24 @@ export default function StylistPage({ mode }: Props) {
           )}
         </div>
       </div>
-      {itemResult && renderItemResults(itemResult)}
-      {personResult && renderPersonResults(personResult)}
+
+      {loading && (
+        <div className="space-y-10 reveal visible">
+           <div className="overline">Analyzing Image & Retrieving Matches</div>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10">
+              {Array.from({length: 4}).map((_, i) => (
+                <div key={i} className="border border-white/10 bg-[#0A0A0A] p-4 flex flex-col h-64 loading-shimmer">
+                   <div className="w-full flex-1 bg-white/5 mb-4"></div>
+                   <div className="h-4 bg-white/5 w-1/2 mb-2"></div>
+                   <div className="h-3 bg-white/5 w-3/4"></div>
+                </div>
+              ))}
+           </div>
+        </div>
+      )}
+
+      {!loading && itemResult && renderItemResults(itemResult)}
+      {!loading && personResult && renderPersonResults(personResult)}
     </div>
   )
 }

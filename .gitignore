@@ -10,3 +10,10 @@ frontend/dist/
 PersonalFashionStylistV2/
 test_reports/
 *.zip
+backend/static/uploads/
+graphs/
+logs/
+readme_main.md
+image_testing.md
+main_info.md
+model_project.py

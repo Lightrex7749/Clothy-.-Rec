@@ -4,6 +4,9 @@ ClothyRec – Item styling service.
 Orchestrates the full pipeline:
   guardrail → classify → direction → FAISS search →
   occasion re-rank → colour harmony → skin re-rank → response
+
+V2: Uses search_with_dedup for improved retrieval quality,
+    adds similarity scores and source domain to recommendations.
 """
 
 from __future__ import annotations
@@ -12,11 +15,12 @@ import logging
 import numpy as np
 from PIL import Image
 from typing import Any, Dict, List, Optional
+from pathlib import Path
 
 from app.config import get_settings
 from app.ml.singleton import get_registry
 from app.ml.classifiers import classify_both
-from app.ml.faiss_index import search_index
+from app.ml.faiss_index import search_index, search_with_dedup
 from app.services.scoring import (
     clothing_color_stats,
     color_harmony_score,
@@ -110,10 +114,19 @@ def process_item(
             "explanation": f"Predicted class '{pred_label}' is not mapped to top or bottom.",
         }
 
-    # ── 6. FAISS search ────────────────────────────────────────────────
-    img_scores, meta_rows = search_index(
-        search_idx, query_vec, search_meta, k=cfg.FAISS_SEARCH_K
-    )
+    # ── 6. FAISS search (V2: with dedup + threshold) ───────────────────
+    if reg.v2_mode:
+        img_scores, meta_rows = search_with_dedup(
+            search_idx, query_vec, search_meta,
+            reg.embeddings_all,
+            k=cfg.FAISS_SEARCH_K,
+            sim_threshold=cfg.SIMILARITY_THRESHOLD,
+            dedup_threshold=cfg.DUPLICATE_THRESHOLD,
+        )
+    else:
+        img_scores, meta_rows = search_index(
+            search_idx, query_vec, search_meta, k=cfg.FAISS_SEARCH_K
+        )
 
     # ── 7. Occasion text scoring ───────────────────────────────────────
     txt_vec = occasion_text_embeddings(reg.clip, occasion_text, occasion_dir)
@@ -133,13 +146,23 @@ def process_item(
     for i in range(len(meta_rows)):
         row_idx = int(meta_rows[i])
         row = reg.meta.iloc[row_idx]
-        img_path = row["path"]
-        label = row["label"]
+        label = row.get("label", "unknown")
+
+        # Skip rows with no label
+        if not label or str(label) == "nan":
+            continue
+
+        img_path = row.get("path", "")
+        source = row.get("source", "legacy")
 
         # Compute item HSV from stored path (if image exists, else skip)
+        path_exists = bool(img_path) and Path(img_path).is_file()
         try:
-            item_img = Image.open(img_path).convert("RGB")
-            item_hsv = clothing_color_stats(item_img)
+            if path_exists:
+                item_img = Image.open(img_path).convert("RGB")
+                item_hsv = clothing_color_stats(item_img)
+            else:
+                raise FileNotFoundError(img_path)
         except Exception:
             item_hsv = (0.0, 0.0, 128.0)
 
@@ -156,18 +179,29 @@ def process_item(
             + cfg.W_SKIN * skin
         )
 
-        # Build image URL (relative path for frontend static serving)
+        # Build image URL
         rel_path = row.get("rel_path", "")
+        image_url = row.get("image_url", "")
+
+        # V2 metadata has image_url pre-computed; V1 uses rel_path
+        if not image_url and rel_path and source == "legacy":
+            image_url = f"/static/dataset/{rel_path}"
+
+        if image_url and not path_exists:
+            image_url = ""
 
         recs.append({
             "label": label,
             "score": round(final, 4),
+            "similarity_score": round(float(img_scores[i]), 4),
             "img_score": round(float(img_scores[i]), 4),
             "txt_score": round(float(txt_scores[i]), 4),
             "harmony": round(harmony, 4),
             "skin": round(skin, 4),
             "image_path": img_path,
             "rel_path": rel_path,
+            "image_url": image_url,
+            "source": source,
         })
 
     # Sort by final score descending, take top k
@@ -184,6 +218,12 @@ def process_item(
     if occasion_text:
         explanation += f" for '{occasion_text}'"
     explanation += f". Top picks include {', '.join(top_labels)}."
+
+    if reg.v2_mode and recs:
+        # Add retrieval quality info
+        avg_sim = np.mean([r["similarity_score"] for r in recs])
+        sources = set(r["source"] for r in recs)
+        explanation += f" (avg similarity: {avg_sim:.2f}, sources: {', '.join(sources)})"
 
     return {
         "clothing_check": clothing_check,

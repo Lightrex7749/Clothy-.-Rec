@@ -11,12 +11,14 @@ async def health():
     try:
         reg = get_registry()
         return {"status": "ok", "models_loaded": True, "device": reg.device,
-                "num_classes": reg.num_classes, "index_size": reg.embeddings_all.shape[0]}
+                "num_classes": reg.num_classes, "index_size": reg.embeddings_all.shape[0],
+                "v2_mode": reg.v2_mode}
     except Exception:
-        return {"status": "ok", "models_loaded": False, "device": cfg.DEVICE}
+        return {"status": "ok", "models_loaded": False, "device": cfg.DEVICE, "v2_mode": False}
 
 @router.get("/labels")
 async def labels():
     reg = get_registry()
     return {"labels": reg.label_list, "top_classes": sorted(get_settings().TOP_CLASSES),
-            "bottom_classes": sorted(get_settings().BOTTOM_CLASSES)}
+            "bottom_classes": sorted(get_settings().BOTTOM_CLASSES),
+            "v2_mode": reg.v2_mode}

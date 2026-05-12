@@ -153,7 +153,7 @@ function Landing({ onStart, healthy }: { onStart: (v?: View) => void; healthy: b
             {healthy !== null && (
               <div className="reveal-initial reveal-delay-3 flex items-center gap-2 text-xs text-zinc-500">
                 <div className={`w-2 h-2 rounded-full ${healthy ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
-                {healthy ? 'ML pipeline active · CPU inference ready' : 'Backend offline'}
+                {healthy ? 'V2 Enhanced Pipeline Active · CPU Ready' : 'Backend offline'}
               </div>
             )}
           </div>
@@ -177,9 +177,9 @@ function Landing({ onStart, healthy }: { onStart: (v?: View) => void; healthy: b
       <section ref={statsRef} className="reveal border-t border-b border-white/10">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 border-x border-white/10">
-            <StatCounter end={8625} label="Indexed Items" />
+            <StatCounter end={57672} label="Indexed Items" />
             <StatCounter end={8} label="Clothing Classes" />
-            <StatCounter end={3} label="ML Models" />
+            <StatCounter end={4} label="ML Models" />
             <StatCounter end={512} label="Embedding Dims" suffix="D" />
           </div>
         </div>

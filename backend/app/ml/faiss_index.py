@@ -3,6 +3,8 @@ ClothyRec – FAISS index helpers.
 
 Loads the master index and builds top-only / bottom-only sub-indices
 at startup so searches are already scoped by clothing direction.
+
+V2 adds duplicate suppression and similarity threshold filtering.
 """
 
 from __future__ import annotations
@@ -67,3 +69,56 @@ def search_index(
     scores, idxs = index.search(query_vec, k)
     global_rows = meta_indices[idxs[0]]
     return scores[0], global_rows
+
+
+def search_with_dedup(
+    index: faiss.Index,
+    query_vec: np.ndarray,
+    meta_indices: np.ndarray,
+    embeddings_all: np.ndarray,
+    k: int = 200,
+    sim_threshold: float = 0.15,
+    dedup_threshold: float = 0.98,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Search with duplicate suppression and similarity threshold filtering.
+
+    Parameters
+    ----------
+    index           : the FAISS sub-index to search
+    query_vec       : (1, D) float32 normalised query
+    meta_indices    : mapping from sub-index rows → global meta rows
+    embeddings_all  : full embedding matrix for dedup checks
+    k               : how many raw candidates to retrieve
+    sim_threshold   : drop results with score below this
+    dedup_threshold : suppress results whose mutual similarity exceeds this
+
+    Returns
+    -------
+    scores     : filtered & deduplicated scores
+    meta_rows  : corresponding global meta row indices
+    """
+    raw_scores, raw_rows = search_index(index, query_vec, meta_indices, k)
+
+    # 1. Similarity threshold
+    keep_mask = raw_scores >= sim_threshold
+    scores = raw_scores[keep_mask]
+    rows = raw_rows[keep_mask]
+
+    if len(scores) == 0:
+        return scores, rows
+
+    # 2. Duplicate suppression (greedy)
+    deduped_idx = [0]
+    deduped_embs = [embeddings_all[rows[0]]]
+
+    for i in range(1, len(rows)):
+        candidate = embeddings_all[rows[i]]
+        # Check against all already-accepted embeddings
+        sims = np.array([float(candidate @ ref) for ref in deduped_embs])
+        if np.all(sims < dedup_threshold):
+            deduped_idx.append(i)
+            deduped_embs.append(candidate)
+
+    deduped_idx = np.array(deduped_idx)
+    return scores[deduped_idx], rows[deduped_idx]

@@ -197,14 +197,19 @@ export default function ProfilePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10">
               {bookmarks.map(b => (
-                <div key={b.id} className="history-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-serif text-lg text-white">{b.label.replace(/_/g, ' ')}</span>
-                    <button onClick={() => { removeBookmark(b.id); reload() }} className="text-zinc-600 hover:text-red-400">
+                <div key={b.id} className="history-card flex flex-col group">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-serif text-lg text-white truncate mr-2" title={b.label.replace(/_/g, ' ')}>{b.label.replace(/_/g, ' ')}</span>
+                    <button onClick={() => { removeBookmark(b.id); reload() }} className="text-zinc-600 hover:text-red-400 shrink-0">
                       <Trash2 size={14} />
                     </button>
                   </div>
-                  <div className="text-zinc-500 text-xs">
+                  {b.imageUrl && (
+                    <div className="w-full aspect-[4/5] bg-surface mb-3 border border-white/10 overflow-hidden relative">
+                      <img src={`${import.meta.env.VITE_API_BASE_URL ?? ''}${b.imageUrl}`} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                    </div>
+                  )}
+                  <div className="text-zinc-500 text-xs mt-auto">
                     Score: {b.score.toFixed(2)} · {b.direction.replace('->', '→')}
                   </div>
                   {b.occasion && <div className="text-zinc-600 text-xs mt-1">Occasion: {b.occasion}</div>}

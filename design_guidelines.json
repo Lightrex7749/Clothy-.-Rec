@@ -1,0 +1,100 @@
+{
+  "theme": "dark",
+  "archetype": "Archetype 4: Swiss & High-Contrast (Editorial Luxury Variant)",
+  "vibe": "High fashion magazine meets digital brutalism. Stark, monochrome, massive typography, delicate borders, aggressive asymmetry, and zero rounded corners.",
+  "colors": {
+    "background": "#050505",
+    "surface": "#111111",
+    "surface_glass": "bg-black/60 backdrop-blur-2xl border-white/10",
+    "border": "rgba(255, 255, 255, 0.1)",
+    "text_primary": "#F4F4F5",
+    "text_secondary": "#A1A1AA",
+    "accent_primary": "#FFFFFF",
+    "accent_primary_text": "#000000",
+    "accent_secondary": "#FF3333",
+    "status": {
+      "success": "#34D399",
+      "warning": "#FBBF24",
+      "error": "#F87171"
+    }
+  },
+  "typography": {
+    "import_instruction": "Add to index.css: @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap');",
+    "font_heading": "Cormorant Garamond, serif",
+    "font_body": "Outfit, sans-serif",
+    "hierarchy": {
+      "h1": "font-serif text-5xl md:text-6xl lg:text-7xl tracking-tighter font-light leading-none",
+      "h2": "font-serif text-3xl md:text-4xl lg:text-5xl tracking-tight font-light",
+      "h3": "font-serif text-2xl font-normal",
+      "body": "font-sans text-base leading-relaxed text-zinc-400",
+      "overline": "font-sans text-xs tracking-[0.2em] uppercase font-semibold text-zinc-500",
+      "quote": "font-serif text-xl italic text-zinc-300 border-l border-zinc-700 pl-4"
+    }
+  },
+  "spacing_and_layout": {
+    "container": "w-full max-w-[1400px] mx-auto px-6 lg:px-12",
+    "section_padding": "py-20 lg:py-32",
+    "gap_system": "gap-8 lg:gap-16",
+    "grid_editorial": "grid grid-cols-1 md:grid-cols-12 gap-px bg-white/10", 
+    "card_padding": "p-8 md:p-12",
+    "border_radius": "rounded-none"
+  },
+  "components": {
+    "container_borders": "border border-white/10 bg-[#050505]",
+    "card": "relative border border-white/10 bg-[#0A0A0A] p-6 hover:-translate-y-1 transition-transform duration-500 ease-out rounded-none",
+    "button_primary": "inline-flex items-center justify-center bg-white text-black px-8 py-4 uppercase tracking-[0.15em] text-xs font-bold hover:bg-zinc-200 transition-colors rounded-none",
+    "button_secondary": "inline-flex items-center justify-center border border-white/20 text-white bg-transparent px-8 py-4 uppercase tracking-[0.15em] text-xs font-bold hover:bg-white/5 hover:border-white transition-all rounded-none",
+    "input_field": "w-full bg-transparent border-b border-white/20 px-0 py-4 focus:outline-none focus:border-white focus:ring-0 text-white placeholder-zinc-600 font-sans transition-colors rounded-none",
+    "tabs_list": "flex space-x-8 md:space-x-12 border-b border-white/10 w-full overflow-x-auto no-scrollbar",
+    "tab_active": "border-b-2 border-white pb-4 text-white uppercase tracking-widest text-xs font-medium",
+    "tab_inactive": "pb-4 text-zinc-500 hover:text-zinc-300 uppercase tracking-widest text-xs font-medium transition-colors",
+    "image_container": "bg-[#111] overflow-hidden relative border border-white/10 grayscale hover:grayscale-0 transition-all duration-700",
+    "tag": "px-3 py-1.5 border border-white/20 text-[10px] uppercase tracking-widest text-zinc-300",
+    "progress_bar": "h-px bg-white/20 w-full relative"
+  },
+  "motion": {
+    "hover": "transition-all duration-500 ease-out",
+    "reveal": "opacity-0 translate-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700"
+  },
+  "icons": {
+    "library": "lucide-react",
+    "style": "light, strokeWidth={1} for a delicate, premium look"
+  },
+  "media": {
+    "hero_background_texture": {
+      "url": "https://images.unsplash.com/photo-1676696706907-0e04665b80bd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGRhcmslMjBzaWxrJTIwdGV4dHVyZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc3OTAyNzA2fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract dark silk texture for hero or ambient backgrounds."
+    },
+    "stylist_model_1": {
+      "url": "https://images.pexels.com/photos/31167792/pexels-photo-31167792.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "High fashion model enveloped in red, use for Landing Page hero or Person Photo tab placeholder."
+    },
+    "stylist_model_2": {
+      "url": "https://images.pexels.com/photos/20188868/pexels-photo-20188868.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Moody portrait under blue lighting, use as alternate placeholder for user profile or skin tone analysis."
+    },
+    "wardrobe_item_1": {
+      "url": "https://images.unsplash.com/photo-1776838108803-91bbab8a09da?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNzl8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwZmFzaGlvbiUyMGNsb3RoZXMlMjBoYW5naW5nfGVufDB8fHx8MTc3NzkwMjcwNnww&ixlib=rb-4.1.0&q=85",
+      "description": "Minimalist clothes hanging. Use for Wardrobe/Saved Outfits empty state or placeholders."
+    },
+    "wardrobe_item_2": {
+      "url": "https://images.unsplash.com/photo-1766934587214-86e21b3ae093?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNzl8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwZmFzaGlvbiUyMGNsb3RoZXMlMjBoYW5naW5nfGVufDB8fHx8MTc3NzkwMjcwNnww&ixlib=rb-4.1.0&q=85",
+      "description": "Clothing racks in store. Use for Catalog Mode background."
+    }
+  },
+  "instructions_to_main_agent": [
+    "STRICTLY adhere to the Dark Swiss Brutalist/Editorial theme. Absolutely NO rounded corners anywhere (use rounded-none globally).",
+    "Override default Shadcn components heavily: Strip out their default borders, radii, and backgrounds. Ensure they match the minimalist 1px border-white/10 aesthetic.",
+    "Typography: Use Cormorant Garamond for ALL headings (H1, H2, H3) with tight tracking and light weight. Use Outfit for UI/body text, buttons, and overlines.",
+    "Navigation & Header: Must use backdrop-blur-2xl bg-black/60 with a 1px border-white/10 bottom border. Do not let it blend into the content.",
+    "Forms & Inputs: Do not use standard Shadcn card inputs. Inputs should be minimalist, bottom-border only (`border-b border-white/20`), with transparent backgrounds.",
+    "Image Upload Component: Style it as an editorial 'drop zone'—a large rectangular area with a dashed or solid thin border, centered thin icon, and delicate typography. No thick dashes or standard gray boxes.",
+    "Skin Tone Palette: Display as stark geometric squares with 1px borders. Do not use soft drop shadows. Position them in a rigid grid.",
+    "Results View (Stylist Output): Instead of generic progress bars, use thin 1px lines (`h-px bg-white/20`) with a highlighted section (`bg-white`) for scores. Score breakdowns should look like technical data readouts (monospace or strict uppercase sans-serif).",
+    "Gemini Explanation: Display this in a chic, editorial blockquote style. Use the `quote` typography rule (Cormorant Garamond, italic, subtle left border).",
+    "Toggles: Instead of standard iOS-style pill toggles, use rigid rectangular switches or high-contrast button groups (e.g., [ YES / NO ] stark blocks).",
+    "All interactive elements (buttons, inputs, tabs, upload areas) MUST have `data-testid` attributes (e.g., `data-testid='upload-photo-btn'`).",
+    "Use `lucide-react` icons globally. Set `strokeWidth={1}` for an elegant, thin look.",
+    "Layout Strategy: Embrace asymmetry in marketing/landing sections. Use wide gaps (`gap-16`) and rigid 1px grid lines to separate content rather than cards with shadows."
+  ]
+}

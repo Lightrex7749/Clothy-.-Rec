@@ -1,0 +1,77 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "backend: dev",
+			"type": "shell",
+			"command": "d:\\ProjectsGit\\Atelier\\.venv\\Scripts\\python.exe",
+			"args": [
+				"-m",
+				"uvicorn",
+				"app.main:app",
+				"--app-dir",
+				"backend",
+				"--port",
+				"8002",
+				"--reload"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "frontend: dev",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"--prefix",
+				"frontend",
+				"run",
+				"dev"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "backend: dev",
+			"type": "shell",
+			"command": "d:\\ProjectsGit\\Atelier\\.venv\\Scripts\\python.exe",
+			"args": [
+				"-m",
+				"uvicorn",
+				"app.main:app",
+				"--app-dir",
+				"backend",
+				"--port",
+				"8002",
+				"--reload"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "frontend: dev",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"--prefix",
+				"frontend",
+				"run",
+				"dev"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "backend: dev",
+			"type": "shell",
+			"command": "d:\\ProjectsGit\\Atelier\\.venv\\Scripts\\python.exe",
+			"args": [
+				"-m",
+				"uvicorn",
+				"app.main:app",
+				"--app-dir",
+				"backend",
+				"--port",
+				"8002",
+				"--reload"
+			],
+			"isBackground": true
+		}
+	]
+}

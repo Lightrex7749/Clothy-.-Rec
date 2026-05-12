@@ -30,11 +30,21 @@ class Settings(BaseSettings):
     # Upload directory for saved images / crops
     UPLOAD_DIR: str = ""   # defaults to BASE_DIR/static/uploads
 
+    # ── V2 asset directory ─────────────────────────────────────────────
+    V2_DIR: str = ""       # defaults to BASE_DIR/../PersonalFashionStylistV2
+
     # ── Device ─────────────────────────────────────────────────────────
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # ── Class mappings ─────────────────────────────────────────────────
+    # ── Class mappings (V2 unified label set) ──────────────────────────
     TOP_CLASSES: set[str] = {
+        # V2 labels
+        "shirt",
+        "tshirt",
+        "hoodie",
+        "sweater",
+        "jacket",
+        # Legacy V1 labels (kept for compatibility)
         "casual_shirts",
         "formal_shirts",
         "printed_tshirts",
@@ -42,7 +52,10 @@ class Settings(BaseSettings):
         "printed_hoodies",
     }
     BOTTOM_CLASSES: set[str] = {
+        # V2 labels
         "jeans",
+        "pants",
+        # Legacy V1 labels
         "formal_pants",
         "men_cargos",
     }
@@ -57,20 +70,28 @@ class Settings(BaseSettings):
     # ── Thresholds ─────────────────────────────────────────────────────
     CLOTHING_MARGIN: float = 0.03        # CLIP clothing vs non-clothing margin
     MIN_CLASSIFIER_CONF: float = 0.40    # ensemble confidence floor
-    FAISS_SEARCH_K: int = 150            # how many candidates to pull from FAISS
+    FAISS_SEARCH_K: int = 200            # how many candidates to pull from FAISS (increased for V2)
     REC_K: int = 8                       # final recommendations returned
+    SIMILARITY_THRESHOLD: float = 0.15   # minimum cosine similarity to keep
+    DUPLICATE_THRESHOLD: float = 0.98    # suppress results above this mutual similarity
 
     # ── CORS ───────────────────────────────────────────────────────────
     CORS_ORIGINS: str = "*"
 
     # ── Optional Gemini (server-side only, for explanations) ───────────
     GEMINI_API_KEY: str = ""
+    GEMINI_IMAGE_MODEL: str = ""  # model name for image generation
 
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
 
     # ── Computed defaults ──────────────────────────────────────────────
+    def get_v2_dir(self) -> Path:
+        if self.V2_DIR:
+            return Path(self.V2_DIR)
+        return self.BASE_DIR.parent / "PersonalFashionStylistV2"
+
     def get_models_dir(self) -> Path:
         if self.MODELS_DIR:
             return Path(self.MODELS_DIR)
