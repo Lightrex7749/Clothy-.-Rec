@@ -8,6 +8,29 @@ import type { PromptPreset } from '../types/api'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 
+const LOADING_STAGES = [
+  {
+    title: 'cutting the silhouette',
+    detail: 'Tracing structure from your base photo and fitting the drape.',
+    eta: '10-20s',
+  },
+  {
+    title: 'weaving the palette',
+    detail: 'Matching undertones, contrast, and fabric sheen for balance.',
+    eta: '15-25s',
+  },
+  {
+    title: 'styling the accents',
+    detail: 'Finishing touches: accessories, layers, and textures.',
+    eta: '10-20s',
+  },
+  {
+    title: 'rendering the lookbook',
+    detail: 'Polishing light, grain, and print details for the final reveal.',
+    eta: '5-15s',
+  },
+]
+
 export default function ChatPage() {
   const revealRef = useReveal()
   const [genFile, setGenFile] = useState<File | null>(null)
@@ -25,6 +48,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false)
   const [optimizing, setOptimizing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loadingStage, setLoadingStage] = useState(0)
 
   useEffect(() => {
     let mounted = true
@@ -56,6 +80,17 @@ export default function ChatPage() {
       setFinalPrompt(prompt)
     }
   }, [prompt, finalTouched])
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStage(0)
+      return
+    }
+    const intervalId = window.setInterval(() => {
+      setLoadingStage(prev => (prev + 1) % LOADING_STAGES.length)
+    }, 1800)
+    return () => window.clearInterval(intervalId)
+  }, [loading])
 
   const handleFile = (file: File, preview: string) => {
     setGenFile(file)
@@ -143,6 +178,9 @@ export default function ChatPage() {
       setOptimizing(false)
     }
   }
+
+  const activeStage = LOADING_STAGES[loadingStage]
+  const progress = ((loadingStage + 1) / LOADING_STAGES.length) * 100
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 pt-24 min-h-screen flex flex-col">
@@ -291,6 +329,46 @@ export default function ChatPage() {
             )}
           </div>
         </div>
+
+        {loading && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="overline">Look in progress</div>
+              <div className="text-zinc-600 text-xs">Studio feed</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-white text-sm">Atelier is {activeStage.title}...</div>
+                <div className="text-zinc-500 text-xs">ETA {activeStage.eta}</div>
+              </div>
+              <p className="text-zinc-400 text-sm">{activeStage.detail}</p>
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-white/70 loading-shimmer" style={{ width: `${progress}%` }} />
+              </div>
+              <div className="flex items-center gap-2">
+                {LOADING_STAGES.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 w-6 rounded-full ${i === loadingStage ? 'bg-white' : 'bg-white/20'}`}
+                  />
+                ))}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="relative overflow-hidden border border-white/10 bg-[#0B0B0B] aspect-[3/4]"
+                  >
+                    <div className="absolute inset-0 loading-shimmer" />
+                    <div className="absolute bottom-3 left-3 text-[9px] uppercase tracking-widest text-white/60">
+                      Look {i + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div>
           <div className="overline mb-3">Style preset</div>
