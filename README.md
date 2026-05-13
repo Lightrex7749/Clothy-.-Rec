@@ -20,7 +20,7 @@ ClothyRec is a full‑stack AI fashion assistant that blends local computer visi
 - **Classification Ensemble**: ResNet‑18 + EfficientNet‑B0
 - **Embeddings**: OpenCLIP (ViT‑B/32) 512‑D vectors
 - **Retrieval**: FAISS similarity search
-- **Body / Face**: YOLOv8 Pose (cropping), MTCNN (skin analysis)
+- **Body / Face**: YOLOv8 Pose (`yolov8s-pose.pt`, cropping), MTCNN (skin analysis)
 
 ### 2) Gemini Services
 - **Chat**: Gemini generates stylist responses with ML context
@@ -62,18 +62,26 @@ Atelier/
 
 ## ⚙️ Environment Variables
 
-Create a **repo‑root** `.env` file (same level as `backend/`):
+Create a `backend/.env` file:
 
 ```dotenv
-GEMINI_API_KEY=your_key_here
+GEMINI_CHAT_API_KEY=your_chat_key_here
+GEMINI_IMAGE_API_KEY=your_image_key_here
 GEMINI_MODEL=gemini-2.5-flash
 GEMINI_IMAGE_MODEL=your_image_model
+GEMINI_CHAT_RPM=60
+GEMINI_IMAGE_RPM=20
+GEMINI_RATE_WINDOW_SEC=60
+YOLO_POSE_MODEL=yolov8s-pose.pt
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000,*
 DATA_ROOT=D:/path/to/your/dataset
 ```
 
 Notes:
-- `.env` is loaded from the **repo root**.
-- `GEMINI_IMAGE_MODEL` must be **image‑capable** (see Gemini model list for your account).
+- `.env` is loaded from `backend/.env`.
+- `GEMINI_IMAGE_MODEL` must be image-capable (see Gemini model list for your account).
+- `YOLO_POSE_MODEL` can be a filename (resolved under `models/`) or an absolute path.
+- Optional paths: `MODELS_DIR`, `INDEX_DIR`, `UPLOAD_DIR`, `V2_DIR`.
 
 ---
 
@@ -107,10 +115,10 @@ Frontend runs on http://localhost:5173 and proxies API calls to port 8002.
 | `/api/style/item` | `POST` | Analyze a single garment |
 | `/api/style/person` | `POST` | Analyze a full‑body photo |
 | `/api/skin/analyze` | `POST` | Extract skin undertone + palette |
-| `/api/chat` | `POST` | Stylist chat (Gemini) |
+| `/api/gemini/text/chat` | `POST` | Stylist chat (Gemini) |
+| `/api/gemini/text/optimize` | `POST` | Optimize prompt (gender + instructions) |
+| `/api/gemini/image` | `POST` | Generate new looks from photo + prompt |
 | `/api/prompts` | `GET` | Prompt presets + images |
-| `/api/prompts/optimize` | `POST` | Optimize prompt (gender + instructions) |
-| `/api/generate/image` | `POST` | Generate new looks from photo + prompt |
 
 ---
 
@@ -126,6 +134,32 @@ Frontend runs on http://localhost:5173 and proxies API calls to port 8002.
 
 - Large datasets, models, and local files are ignored by git via `.gitignore`.
 - If Gemini image generation returns no images, verify `GEMINI_IMAGE_MODEL` is correct.
+
+---
+
+## 🧪 Model Cache and Benchmark
+
+Pre-download the YOLO pose model into `models/`:
+
+```bash
+python backend/scripts/download_models.py
+```
+
+Benchmark pose models on a full-body image:
+
+```bash
+python backend/scripts/benchmark_pose.py --image path/to/full_body.jpg
+```
+
+---
+
+## ✅ Smoke Tests
+
+These tests validate the Gemini endpoints in no-key mode:
+
+```bash
+pytest backend/tests/test_gemini_routes.py
+```
 
 ---
 
