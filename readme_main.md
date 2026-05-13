@@ -59,7 +59,7 @@ Classes:
 
 ### Personalization (No training required)
 - Skin tone/undertone: **MTCNN face detection** + cheek sampling + Lab color stats
-- Full-body cropping: **YOLOv8 pose** (pretrained) to crop top/bottom regions
+- Full-body cropping: **YOLOv8 pose** (`yolov8s-pose.pt`, pretrained) to crop top/bottom regions
 
 ---
 

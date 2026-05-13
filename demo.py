@@ -474,7 +474,7 @@ def estimate_skin_profile_detailed(face_img_path, show=True):
 import cv2, numpy as np
 from ultralytics import YOLO
 
-pose_model = YOLO("yolov8n-pose.pt")
+pose_model = YOLO("yolov8s-pose.pt")
 
 def crop_top_bottom_from_person(person_path):
     img_bgr = cv2.imread(person_path)

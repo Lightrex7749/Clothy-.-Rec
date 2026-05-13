@@ -1821,7 +1821,7 @@ import cv2, numpy as np
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
 
-pose_model = YOLO("yolov8n-pose.pt")  # small + fast
+pose_model = YOLO("yolov8s-pose.pt")  # balanced speed/accuracy
 
 img_bgr = cv2.imread(person_path)
 if img_bgr is None:
@@ -2237,7 +2237,7 @@ def style_from_person_photo(person_path, occasion_text="casual everyday", use_sk
     # load pose model once (cache it)
     global pose_model
     if "pose_model" not in globals() or pose_model is None:
-        pose_model = YOLO("yolov8n-pose.pt")
+        pose_model = YOLO("yolov8s-pose.pt")
 
     img_bgr = cv2.imread(person_path)
     if img_bgr is None:

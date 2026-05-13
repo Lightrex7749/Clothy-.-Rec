@@ -210,7 +210,7 @@ Skin score:
 ## 9) Full-body Photo Mode (B) — Crop top/bottom via Pose (No Training)
 
 Model:
-- **YOLOv8 pose** (`yolov8n-pose.pt`), pretrained
+- **YOLOv8 pose** (`yolov8s-pose.pt`), pretrained
 
 Process:
 1) detect person + keypoints

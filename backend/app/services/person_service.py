@@ -1,7 +1,7 @@
 """
 ClothyRec – Person (full-body) styling service.
 
-Uses YOLOv8-pose to detect keypoints, crop top/bottom garments,
+Uses YOLOv8s-pose to detect keypoints, crop top/bottom garments,
 then runs the item pipeline on each crop.
 """
 from __future__ import annotations
@@ -17,9 +17,12 @@ _yolo_model = None
 def _get_yolo():
     global _yolo_model
     if _yolo_model is None:
+        cfg = get_settings()
         from ultralytics import YOLO
-        _yolo_model = YOLO("yolov8n-pose.pt")
-        logger.info("YOLOv8-pose loaded")
+        model_path = cfg.get_yolo_pose_model_path()
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        _yolo_model = YOLO(str(model_path))
+        logger.info("YOLO pose model loaded: %s", model_path)
     return _yolo_model
 
 def _clamp(v, lo, hi):
