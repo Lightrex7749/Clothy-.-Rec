@@ -99,16 +99,16 @@ if v2_prompt_dir.is_dir():
 from app.routes.health import router as health_router
 from app.routes.style import router as style_router
 from app.routes.skin import router as skin_router
-from app.routes.chat import router as chat_router
-from app.routes.image_gen import router as image_gen_router
 from app.routes.prompts import router as prompts_router
+from app.routes.gemini_text import router as gemini_text_router
+from app.routes.gemini_image import router as gemini_image_router
 
 app.include_router(health_router)
 app.include_router(style_router)
 app.include_router(skin_router)
-app.include_router(chat_router)
-app.include_router(image_gen_router)
 app.include_router(prompts_router)
+app.include_router(gemini_text_router)
+app.include_router(gemini_image_router)
 
 @app.get("/")
 async def root():

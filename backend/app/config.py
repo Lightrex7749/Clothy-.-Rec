@@ -78,12 +78,24 @@ class Settings(BaseSettings):
     # ── CORS ───────────────────────────────────────────────────────────
     CORS_ORIGINS: str = "*"
 
-    # ── Optional Gemini (server-side only, for explanations) ───────────
+    # ── Optional Gemini (server-side only) ────────────────────────────
+    # Prefer the split keys; GEMINI_API_KEY remains for backward compatibility.
+    GEMINI_CHAT_API_KEY: str = ""
+    GEMINI_IMAGE_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_IMAGE_MODEL: str = ""  # model name for image generation
 
+    # Gemini rate limits (requests per minute, per IP)
+    GEMINI_CHAT_RPM: int = 60
+    GEMINI_IMAGE_RPM: int = 20
+    GEMINI_RATE_WINDOW_SEC: int = 60
+
+    # ── YOLO pose model ───────────────────────────────────────────────
+    YOLO_POSE_MODEL: str = "yolov8s-pose.pt"
+
     class Config:
-        env_file = ".env"
+        env_file = str(Path(__file__).resolve().parent.parent / ".env")
         env_file_encoding = "utf-8"
 
     # ── Computed defaults ──────────────────────────────────────────────
@@ -96,6 +108,15 @@ class Settings(BaseSettings):
         if self.MODELS_DIR:
             return Path(self.MODELS_DIR)
         return self.BASE_DIR.parent / "models"
+
+    def get_yolo_pose_model_path(self) -> Path:
+        model_value = (self.YOLO_POSE_MODEL or "").strip() or "yolov8s-pose.pt"
+        model_path = Path(model_value)
+        if model_path.is_absolute():
+            return model_path
+        if model_path.suffix:
+            return self.get_models_dir() / model_value
+        return self.get_models_dir() / f"{model_value}.pt"
 
     def get_index_dir(self) -> Path:
         if self.INDEX_DIR:

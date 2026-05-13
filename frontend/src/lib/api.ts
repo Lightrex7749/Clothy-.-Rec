@@ -74,7 +74,7 @@ export async function apiChat(
   history: ChatTurn[],
   context?: any,
 ): Promise<ChatResponse> {
-  return request('/api/chat', {
+  return request('/api/gemini/text/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message, history, context }),
@@ -94,7 +94,7 @@ export async function apiGenerateImage(
   fd.append('style', style)
   fd.append('style_prompt', stylePrompt)
   fd.append('count', String(count))
-  return request('/api/generate/image', { method: 'POST', body: fd })
+  return request('/api/gemini/image', { method: 'POST', body: fd })
 }
 
 export async function apiPromptLibrary(): Promise<PromptLibraryResponse> {
@@ -106,7 +106,7 @@ export async function apiOptimizePrompt(
   gender: 'male' | 'female',
   instructions?: string,
 ): Promise<PromptOptimizeResponse> {
-  return request('/api/prompts/optimize', {
+  return request('/api/gemini/text/optimize', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt, gender, instructions }),
