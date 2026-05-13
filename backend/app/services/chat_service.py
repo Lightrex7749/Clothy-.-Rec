@@ -1,4 +1,3 @@
-import os
 import json
 import logging
 import asyncio
@@ -12,9 +11,10 @@ logger = logging.getLogger("clothyrec.services.chat")
 def _get_client() -> Optional[genai.Client]:
     from app.config import get_settings
     cfg = get_settings()
-    if not cfg.GEMINI_API_KEY:
+    api_key = cfg.GEMINI_CHAT_API_KEY or cfg.GEMINI_API_KEY
+    if not api_key:
         return None
-    return genai.Client(api_key=cfg.GEMINI_API_KEY)
+    return genai.Client(api_key=api_key)
 
 
 async def optimize_prompt(
@@ -42,7 +42,7 @@ async def optimize_prompt(
 
     from app.config import get_settings
     cfg = get_settings()
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    model_name = cfg.GEMINI_MODEL
 
     def _call_gemini() -> str:
         response = client.models.generate_content(
@@ -70,7 +70,7 @@ async def generate_chat_response(
     """
     client = _get_client()
     if not client:
-        return "I am an AI stylist, but my Gemini API key is not configured. Please check the server settings."
+        return "I am an AI stylist, but GEMINI_CHAT_API_KEY is not configured. Please check the server settings."
 
     # Construct the system instruction
     system_instruction = (
@@ -97,7 +97,7 @@ async def generate_chat_response(
 
     from app.config import get_settings
     cfg = get_settings()
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    model_name = cfg.GEMINI_MODEL
 
     def _call_gemini() -> str:
         response = client.models.generate_content(

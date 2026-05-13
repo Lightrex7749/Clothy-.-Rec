@@ -23,7 +23,7 @@ from google.genai import types  # type: ignore[import-not-found]
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_CHAT_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 GEMINI_CLIENT = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -111,10 +111,10 @@ async def _gemini_json(
 ) -> dict:
     """Call Gemini and parse structured JSON. Raises on errors."""
     if not GEMINI_API_KEY:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured on server")
+        raise HTTPException(status_code=500, detail="GEMINI_CHAT_API_KEY not configured on server")
 
     if GEMINI_CLIENT is None:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured on server")
+        raise HTTPException(status_code=500, detail="GEMINI_CHAT_API_KEY not configured on server")
 
     client = GEMINI_CLIENT
     assert client is not None
